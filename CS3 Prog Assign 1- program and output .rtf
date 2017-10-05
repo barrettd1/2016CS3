@@ -1,0 +1,128 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf470
+{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww15740\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Danyelle Barrett\
+\
+Program:\
+//Danyelle Barrett\
+//Programming Assignment 1: Postfix Expression Calculator\
+//Due: 9/14/16\
+import java.util.*;\
+import java.io.*;\
+import java.util.regex.Pattern;\
+public class PostfixExpCalculator\
+\{\
+    public static void main(String [] args) throws IOException\
+    \{\
+        BufferedReader inputStream = new BufferedReader(new FileReader("in.dat"));\
+        String line = inputStream.readLine();\
+        double answer;\
+        \
+        System.out.println("Hi, this is a postfix expression calculator.");\
+        while(line != null)                 //loop to read every line in the file\
+        \{\
+            answer = evaluate(line);        //pass the line of tokens to be evaluated\
+            System.out.println("\\nThe value of \\"" + line + "\\" is " + answer);     //display the answer\
+            line = inputStream.readLine();\
+        \}\
+        \
+        inputStream.close();\
+        System.out.println("\\nThere are no more expressions to evaluate. Bye!");\
+    \}\
+    \
+    /*  This method is passed a String s, in which it will read token by token. If the token is a double, \
+     * then it is pushed onto a stack. If the tokenis an operator, then depending on which operator it is,\
+     * either one or two values will be popped off of the stack, evaluated, and then the new value will be \
+     * pushed back onto the stack. By the end of the method, only one value will be left in the stack, in\
+     * which that value is popped off and returned as the answer to the expression.\
+     */\
+    public static double evaluate(String s)\
+    \{\
+        Scanner input = new Scanner(s);\
+        Stack<Double> numbers = new Stack<Double>();\
+        String next;\
+        char first;\
+        double operand1, operand2;\
+        \
+        while(input.hasNext())\
+        \{\
+            if(input.hasNext(UNSIGNED_DOUBLE))\
+            \{\
+                next = input.findInLine(UNSIGNED_DOUBLE);\
+                numbers.push(new Double(next));\
+            \}\
+            else\
+            \{\
+                next = input.findInLine(CHARACTER);\
+                first = next.charAt(0);\
+                \
+                operand2 = numbers.pop();\
+    \
+                switch(first)\
+                \{\
+                    case '_': // Unary negation\
+                        numbers.push(operand2 * -1);\
+                        break;\
+                    case '#': // Square root\
+                        numbers.push(Math.sqrt(operand2));\
+                        break;\
+                    case '+': // Addition\
+                        operand1 = numbers.pop();\
+                        numbers.push(operand1 + operand2);\
+                        break;\
+                    case '-': // Subtraction\
+                        operand1 = numbers.pop();\
+                        numbers.push(operand1 - operand2);\
+                        break;\
+                    case '*': // Multiplication\
+                        operand1 = numbers.pop();\
+                        numbers.push(operand1 * operand2);\
+                        break;\
+                    case '/': // Division\
+                        operand1 = numbers.pop();\
+                        numbers.push(operand1 / operand2);\
+                        break;\
+                    case '^': //Exponentiation\
+                        operand1 = numbers.pop();\
+                        numbers.push(Math.pow(operand1, operand2));\
+                        break;\
+                    default : // Illegal character\
+                       throw new IllegalArgumentException("Illegal character");\
+                \}\
+            \}\
+        \}\
+        if (numbers.size( ) != 1)\
+                throw new IllegalArgumentException("Illegal input expression");\
+        return numbers.pop( );\
+    \}\
+\
+    // These patterns are from Appendix B of Data Structures and Other Objects.\
+    // These may be used in hasNext and findInLine to read certain patterns\
+    // from a Scanner.\
+    public static final Pattern CHARACTER =\
+        Pattern.compile("\\\\S.*?");  \
+    public static final Pattern UNSIGNED_DOUBLE =\
+        Pattern.compile("((\\\\d+\\\\.?\\\\d*)|(\\\\.\\\\d+))([Ee][-+]?\\\\d+)?.*?");\
+\}\
+\
+Output:\
+Hi, this is a postfix expression calculator.\
+\
+The value of "2 3 ^ 35 5 / -" is 1.0\
+\
+The value of "1 2 + 3 * # 4 - 5 6 - + _" is 2.0\
+\
+The value of "2.5 8 * 5 _ * _ # 3 4 + -" is 3.0\
+\
+The value of "144 # 6 / 2 ^ 9876 4938 / 2 ^ ^ 2 5 * 2 ^ 6 2 ^ - /" is 4.0\
+\
+The value of "1 2 1234 1231 - + 2 - 9 # * + 5 -" is 5.0\
+\
+The value of "100 50 / 2006 2003 - 2.5 1.25 / 4 ^ * * 2 4 2 ^ # ^ /" is 6.0\
+\
+The value of "4 8 * 15 100 # _ + 3 5 * 10 - * -" is 7.0\
+\
+There are no more expressions to evaluate. Bye!}
